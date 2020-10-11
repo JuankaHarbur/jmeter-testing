@@ -22,11 +22,9 @@ RUN    apk update \
 ENV PATH $PATH:$JMETER_BIN
 
 # Content for Jmeter (configmap)
+COPY info.sh /
+COPY testing.jmx /
+COPY var.csv /
+COPY custom.properties /
 
-#COPY testing.jmx /
-#COPY var.csv /
-#COPY custom.properties /
-
-# Ejecucion test ()
-
-RUN [ "jmeter","-p","custom.properties","-n","-t","testing.jmx" ]
+RUN chmod 777 info.sh
