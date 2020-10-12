@@ -2,25 +2,28 @@ apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
   name: jmeter-cronjob
+  labels:
+    app: jmeter-cronjob
 spec:
-  schedule: "2 * * * *"
+  schedule: "1 * * * *"
   jobTemplate:
     spec:
       template:
         metadata:
           labels:
-            app: jmeter
+            app: jmeter-cronjob
         spec:
           volumes:
             - name: volume-1
               persistentVolumeClaim:
                 claimName: testing-jmeter
           containers:
-            - name: test-jmeter
+            - name: jmeter-cronjob
               image: 'juankanh/jmeter-docker:latest'
-              command: [ "jmeter","-p","custom.properties","-n","-t","testing.jmx" ]
+              command: ["bash","info.sh"]
               resources: {}
               volumeMounts:
                 - name: volume-1
                   mountPath: /result
           restartPolicy: Never
+status: {}

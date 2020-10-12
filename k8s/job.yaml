@@ -15,7 +15,7 @@ spec:
       containers:
         - name: test-jmeter
           image: 'juankanh/jmeter-docker:latest'
-          command: [ "jmeter","-p","custom.properties","-n","-t","testing.jmx" ]
+          command: ["bash","info.sh"]
           resources: {}
           volumeMounts:
             - name: volume-1
