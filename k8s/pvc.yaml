@@ -1,10 +1,10 @@
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
-  name: test-jmeter
+  name: testing-jmeter
   creationTimestamp: null
   labels:
-    app: test-jmeter
+    app: testing-jmeter
 spec:
   accessModes:
     - ReadWriteOnce
