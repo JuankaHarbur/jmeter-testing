@@ -1,0 +1,118 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: jmeter-run
+  namespace: produccion
+  selfLink: /api/v1/namespaces/produccion/configmaps/jmeter-run
+data:
+  info.sh: "#!/bin/sh\r\necho \"THIS INFO FOR EXECUTING JMETER\"\r\necho \"\"\r\necho
+    \"Donwload tests files\"\r\ngit clone https://github.com/JuankaHarbur/test.git\r\necho
+    \"End git clone\"\r\necho \"\"\r\nchmod 777 test/app-python/run.sh\r\nbash test/app-python/run.sh"
+
+---
+
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: testing-jmeter
+  creationTimestamp: null
+  labels:
+    app: testing-jmeter
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+status: {}
+
+---
+
+kind: Job
+apiVersion: batch/v1
+metadata:
+  name: jmeter-job
+  creationTimestamp: null
+  labels:
+    app: jmeter-cronjob
+spec:
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: jmeter-job
+    spec:
+      volumes:
+        - name: volume-1
+          persistentVolumeClaim:
+            claimName: testing-jmeter
+        - name: volume-2
+          configMap:
+            name: jmeter-run
+      containers:
+        - name: jmeter-job
+          image: 'juankanh/jmeter-docker:latest'
+          command: ["bash"]
+          args: ["main/info.sh","| /sh"]
+          env:
+            - name: jmeter-run
+              valueFrom:
+                configMapKeyRef:
+                  name: jmeter-run
+                  key: info.sh
+          resources: {}
+          volumeMounts:
+            - name: volume-1
+              mountPath: /result
+            - name: volume-2
+              mountPath: /main
+      restartPolicy: Never
+status: {}
+
+---
+
+kind: CronJob
+apiVersion: batch/v1beta1
+metadata:
+  name: jmeter-cronjob
+  creationTimestamp: null
+  labels:
+    app: jmeter-cronjob
+spec:
+  schedule: "* * * * *"
+  jobTemplate:
+    metadata:
+      creationTimestamp: null
+    spec:
+      template:
+        metadata:
+          creationTimestamp: null
+          labels:
+            app: jmeter-cronjob
+        spec:
+          volumes:
+            - name: volume-1
+              persistentVolumeClaim:
+                claimName: testing-jmeter
+            - name: volume-2
+              configMap:
+                name: jmeter-run
+          containers:
+            - name: jmeter-cronjob
+              image: 'juankanh/jmeter-docker:latest'
+              command: ["bash"]
+              args: ["main/info.sh","| /sh"]
+              env:
+                - name: INFO
+                  valueFrom:
+                    configMapKeyRef:
+                      name: jmeter-run
+                      key: info.sh
+              resources: {}
+              volumeMounts:
+                - name: volume-1
+                  mountPath: /result
+                - name: volume-2
+                  mountPath: /main
+          restartPolicy: Never
+status: {}
