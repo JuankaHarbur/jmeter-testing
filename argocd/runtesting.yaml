@@ -116,3 +116,44 @@ spec:
                   mountPath: /main
           restartPolicy: Never
 status: {}
+
+---
+
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: filebrowser
+  creationTimestamp: null
+  labels:
+    app: filebrowser
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: filebrowser
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: filebrowser
+    spec:
+      volumes:
+        - name: volume-1
+          persistentVolumeClaim:
+            claimName: testing-jmeter
+      containers:
+        - name: filebrowser
+          image: 'juankanh/filebrowser:latest'
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          env:
+            - name: FB_ROOT
+              value: /result
+          resources: {}
+          volumeMounts:
+            - name: volume-1
+              mountPath: /result
+  strategy: {}
+status: {}
