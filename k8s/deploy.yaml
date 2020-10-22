@@ -16,11 +16,23 @@ spec:
           - name: volume-1
             persistentVolumeClaim:
               claimName: testing-jmeter
+          - name: volume-2
+            configMap:
+              name: jmeter-run
       containers:
         - name: test-jmeter
           image: 'juankanh/jmeter-docker:latest'
-          command: ["bash","info.sh"]
+          command: ["bash"]
+          args: ["main/info.sh","| /sh"]
           resources: {}
           volumeMounts:
             - name: volume-1
               mountPath: /result
+            - name: volume-2
+              mountPath: /main
+          env:
+            - name: INFO
+              valueFrom:
+                configMapKeyRef:
+                  name: jmeter-run
+                  key: info.sh

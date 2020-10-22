@@ -23,6 +23,6 @@ RUN    apk update \
 ENV PATH $PATH:$JMETER_BIN
 
 # Content for Jmeter (configmap)
-COPY info.sh /
+# COPY info.sh /
 
-RUN chmod 777 info.sh
+# RUN chmod 777 info.sh

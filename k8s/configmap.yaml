@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: jmeter-run
+  namespace: produccion
+  selfLink: /api/v1/namespaces/produccion/configmaps/jmeter-run
+data:
+  info.sh: "#!/bin/sh\r\necho \"THIS INFO FOR EXECUTING JMETER\"\r\necho \"\"\r\necho
+    \"Donwload tests files\"\r\ngit clone https://github.com/JuankaHarbur/test.git\r\necho
+    \"End git clone\"\r\necho \"\"\r\nchmod 777 test/app-python/run.sh\r\nbash test/app-python/run.sh"

@@ -1,15 +1,19 @@
-apiVersion: batch/v1beta1
 kind: CronJob
+apiVersion: batch/v1beta1
 metadata:
   name: jmeter-cronjob
+  creationTimestamp: null
   labels:
     app: jmeter-cronjob
 spec:
-  schedule: "1 * * * *"
+  schedule: "* * * * *"
   jobTemplate:
+    metadata:
+      creationTimestamp: null
     spec:
       template:
         metadata:
+          creationTimestamp: null
           labels:
             app: jmeter-cronjob
         spec:
@@ -17,13 +21,25 @@ spec:
             - name: volume-1
               persistentVolumeClaim:
                 claimName: testing-jmeter
+            - name: volume-2
+              configMap:
+                name: jmeter-run
           containers:
             - name: jmeter-cronjob
               image: 'juankanh/jmeter-docker:latest'
-              command: ["bash","info.sh"]
+              command: ["bash"]
+              args: ["main/info.sh","| /sh"]
+              env:
+                - name: INFO
+                  valueFrom:
+                    configMapKeyRef:
+                      name: jmeter-run
+                      key: info.sh
               resources: {}
               volumeMounts:
                 - name: volume-1
                   mountPath: /result
+                - name: volume-2
+                  mountPath: /main
           restartPolicy: Never
 status: {}
